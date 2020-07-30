@@ -8,7 +8,8 @@ import numpy as np
 import sys
 from stocklist import NasdaqController
 from tqdm import tqdm
-
+import pkg_resources.py2_warn
+from yahoo_fin import stock_info
 
 class mainObj:
     def getData(self, ticker):
@@ -51,10 +52,12 @@ class mainObj:
     def customPrint(self, d, tick):
         print("\n\n\n*******  " + tick.upper() + "  *******")
         print("Ticker is: "+tick.upper())
+        print(" Dates    -  Volume")
         for i in range(len(d['Dates'])):
             str1 = str(d['Dates'][i])
             str2 = str(d['Volume'][i])
             print(str1 + " - " + str2)
+        print("Current Stock Price:", round(stock_info.get_live_price(tick),2))
         print("*********************\n\n\n")
 
     def days_between(self, d1, d2):
@@ -81,4 +84,9 @@ class mainObj:
 
 # input desired anomaly standard deviation cuttoff
 # run time around 50 minutes for every single ticker.
-mainObj().main_func(10)
+print("Scans only NASDAQ\n")
+keep_alive = 1
+while keep_alive != 0:
+    standrd_deviation = input("Standard Deviation: ")
+    mainObj().main_func(int(standrd_deviation))
+    keep_alive = input("0 to exit: ")
