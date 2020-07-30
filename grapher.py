@@ -9,6 +9,8 @@ import matplotlib
 import matplotlib.dates as mdates
 from dateutil import parser
 import numpy as np
+from sys import argv
+import pkg_resources.py2_warn
 
 
 class mainObj:
@@ -19,13 +21,14 @@ class mainObj:
         data = yf.download(ticker, pastDate, currentDate)
         return data[["Volume"]]
 
-    def printData(self, data):
+    def printData(self, data, ticker):
+        print(ticker)
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             cleanData_print = data.copy()
             cleanData_print.reset_index(level=0, inplace=True)
             print(cleanData_print.to_string(index=False))
 
-    def barGraph(self, data):
+    def barGraph(self, data, ticker):
         data.reset_index(level=0, inplace=True)
         tempList = []
         for x in data['Date']:
@@ -35,6 +38,9 @@ class mainObj:
         data.set_index('goodDate', inplace=True)
         ################
         fig, ax = plt.subplots(figsize=(15, 7))
+        fig.suptitle(ticker, fontsize=14, fontweight='bold')
+        ax.set_xlabel('Date', fontsize=14)
+        ax.set_ylabel('Volume', fontsize=14)
         data.plot(kind='bar', ax=ax)
         ax.get_yaxis().set_major_formatter(
             matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -42,9 +48,13 @@ class mainObj:
         ################
         plt.show()
 
-    def lineGraph(self, data):
+    def lineGraph(self, data, ticker):
         data.reset_index(level=0, inplace=True)
         fig, ax = plt.subplots(figsize=(15, 7))
+        fig.canvas.set_window_title(ticker)
+        fig.suptitle(ticker, fontsize=14, fontweight='bold')
+        ax.set_xlabel('Date', fontsize=14)
+        ax.set_ylabel('Volume', fontsize=14)
         ax.plot(data['Date'], data['Volume'])
         ax.get_yaxis().set_major_formatter(
             matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -71,9 +81,11 @@ class mainObj:
 
 # setup
 main = mainObj()
-
-# commands
-data = main.getData("KODK")
-# main.printData(data)
-# main.barGraph(data)
-main.lineGraph(data)
+ticker = input("Stock (0 to exit): ")
+while ticker != "0":
+    # commands
+    data = main.getData(ticker)
+    #main.printData(data, ticker)
+    #main.barGraph(data, ticker)
+    main.lineGraph(data,ticker)
+    ticker = input("Stock: ")
